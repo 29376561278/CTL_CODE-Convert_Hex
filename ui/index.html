@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mmgui demo</title>
+    <style>
+		html{
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+		}
+#shuru{
+	position: absolute;
+  top:22%;
+  left: 40%;
+}
+#biaoti{
+  display: flex;
+    flex-direction: column;
+	position: absolute;
+top: 38%;
+left: 27%;
+transform: translate(-40%, -50%);
+text-align: center;
+}
+
+#xuanze{
+  position: absolute;
+border: 1px solid black;
+width: 780px;
+top: 7%;
+left: 20%;
+height:60px;
+margin-top: 30px;
+}
+#form{
+    /*padding-top: -80px;  */
+    /* padding-left: 130px; */
+    margin-top:30px;
+	margin-left: 80px;
+}
+#selset{
+  position: absolute;
+	top: 3%;
+	left: 55%;
+}
+#codeToMacro{
+  margin-top: -30px;
+  margin-left: 80px;
+}
+#macroToCode{
+  margin-left: 160px;
+}
+#code,#DeviceType,#Function,#Method,#Access{
+margin-bottom: 16px;
+width: 260px;
+height: 30px;
+resize: none;
+}
+#jieguo{
+  position: absolute;
+  border: 1px solid black;
+  top:60%;
+  width: 780px;
+  height: 80px;
+ left:20%;
+}
+#ctl,#selset{
+  position: absolute;
+  left:48%
+}
+#out{
+  position: absolute;
+  left: 8px;
+  resize: none;
+  margin-top: 40PX;
+  width: 760px;
+}
+#recv{
+  position: absolute;
+  left: 70%;
+  top: 25%;
+}
+#to1{
+  position: absolute;
+  height: 50px;
+  width: 60px;
+}
+#to2{
+  position: absolute;
+  height: 50px;
+  width: 60px;
+  margin-top: 100px;
+}
+
+#to1,#to2{
+  font-weight: bold;
+}
+    </style>
+</head>
+<body>
+  <p id="selset">Selset</p>
+  <div id="xuanze">
+
+    <form id="form">
+
+  <label for="codeToMacro" class="radio-label">
+    <input type="radio" id="codeToMacro" name="conversionType" value="codeToMacro" onclick="codeToMacro1()">
+    Code To Macro
+  </label>
+  <label for="macroToCode" class="radio-label">
+    <input type="radio" id="macroToCode" name="conversionType" value="macroToCode" onclick="macroToCode1()">
+    Macro To Code
+  </label>
+
+</form>
+
+  </div>
+<div id="biaoti">
+        <label class="item">Control Code(Hex):</label>
+      <br><br>
+      <label class="item">DeviceType(Hex):</label>
+    <br><br>
+      <label class="item">Function:</label>
+    <br><br>
+      <label class="item">Method:</label>
+    <br><br>
+      <label class="item">Access:</label>
+
+</div>
+<div id="shuru">
+	<textarea id="code"></textarea>
+	<br>
+	<textarea id="DeviceType"></textarea>
+	<br>
+	<textarea id="Function"></textarea>
+	<br>
+	<textarea id="Method"></textarea>
+	<br>
+	<textarea id="Access"></textarea>
+
+</div>
+<div id="jieguo">
+    <p id="ctl">CTL_CODE</p>
+      <textarea id="out" disabled="true"></textarea>
+</div>
+<div id="recv">
+    <input value="To" type="button" id="to1" onclick="to1_recv()">
+    <br>
+    <input value="To" type="button" id="to2" onclick="to2_recv()">
+</div>
+</body>
+</html>
+<script>
+  var list_out = [];
+  var dict_num = {};
+function codeToMacro1(){
+  document.getElementById("DeviceType").value = "";
+  document.getElementById("Function").value = "";
+  document.getElementById("Method").value = "";
+  document.getElementById("Access").value = "";
+  document.getElementById("code").value = "";
+  document.getElementById("out").value = "";
+
+ var textarea1 = document.getElementById("DeviceType");
+ var textarea2 = document.getElementById("Function");
+ var textarea3 = document.getElementById("Method");
+ var textarea4 = document.getElementById("Access");
+ var textarea5 = document.getElementById("code");
+  textarea5.disabled = false;
+  textarea1.disabled = true;
+  textarea2.disabled = true;
+  textarea3.disabled = true;
+  textarea4.disabled = true;
+  var to1 = document.getElementById("to2");
+  to1.disabled = true;
+  var to2 = document.getElementById("to1");
+  to2.disabled = false;
+  var out1 = document.getElementById("out");
+  out1.disabled = true;
+}
+function macroToCode1(){
+  document.getElementById("DeviceType").value = "";
+  document.getElementById("Function").value = "";
+  document.getElementById("Method").value = "";
+  document.getElementById("Access").value = "";
+  document.getElementById("code").value = "";
+  document.getElementById("out").value = "";
+
+  var textarea1 = document.getElementById("DeviceType");
+ var textarea2 = document.getElementById("Function");
+ var textarea3 = document.getElementById("Method");
+ var textarea4 = document.getElementById("Access");
+ var textarea5 = document.getElementById("code");
+
+  textarea1.disabled = false;
+  textarea2.disabled = false;
+  textarea3.disabled = false;
+  textarea4.disabled = false;
+  textarea5.disabled = true;
+  var to1 = document.getElementById("to1");
+  to1.disabled = true;
+  var to2 = document.getElementById("to2");
+  to2.disabled = false;
+  var out1 = document.getElementById("out");
+  out1.disabled = false;
+
+}
+
+
+
+function to1_recv(){
+  document.getElementById("out").value=null
+  var code = document.getElementById("code").value;
+  if (code == ""){
+      alert("请输入Control Code")
+  }
+
+  RPC.invoke("operation", {"msg": {"code":code}}).then((result) => {});
+     window.addEventListener('message', (event) => {
+            var show_msg1 = event.data.msg
+            if (show_msg1.charAt(0) == "^"){
+              list1 = show_msg1.split(")")[0].split("(")[1].split(",")
+              document.getElementById("DeviceType").value=list1[0]
+              document.getElementById("Function").value=list1[1]
+              document.getElementById("Method").value=list1[2]
+              document.getElementById("Access").value=list1[3]
+              document.getElementById("out").value=show_msg1.substr(1)
+            }
+          });
+        }
+function to2_recv(){
+  document.getElementById("code").value=null
+  var devicetype = document.getElementById("DeviceType").value;
+  var function_num = document.getElementById("Function").value;
+  var method = document.getElementById("Method").value;
+  var access = document.getElementById("Access").value;
+  var out_num = document.getElementById("out").value;
+  dict_temporary = {
+        "device_type":devicetype,
+        "function":function_num,
+        "method":method,
+        "access":access
+      }
+  if(devicetype != "" && function_num != "" && method != "" && access != "" && out_num!=""){
+
+      var list_temporary = out_num.split(")")[0].split("(")[1].split(",")
+      dict_temporary1 = {
+        "device_type":devicetype,
+        "function":function_num,
+        "method":method,
+        "access":access
+      }
+    if(dict_num != undefined && list_out.length != 0){
+      if (JSON.stringify(dict_num) != JSON.stringify(dict_temporary1)){
+        out_num = "#define IO_CTL_DIY CTL_CODE(" + dict_temporary1["device_type"] + ", " + dict_temporary1["function"] + "," + dict_temporary1["method"] + "," + dict_temporary1["access"] + ")"
+        document.getElementById("out").value = out_num
+    }
+      if (JSON.stringify(list_out) != JSON.stringify(list_temporary)){
+      document.getElementById("DeviceType").value = list_temporary[0];
+            document.getElementById("Function").value = list_temporary[1].trimStart();
+            document.getElementById("Method").value = list_temporary[2];
+            document.getElementById("Access").value = list_temporary[3];
+          }
+          }
+
+  document.getElementById("DeviceType").value = "";
+  document.getElementById("Function").value = "";
+  document.getElementById("Method").value = "";
+  document.getElementById("Access").value = "";
+
+  to3_recv(out_num)
+
+  }else if (devicetype != "" && function_num != "" && method != "" && access != "" && out_num == ""){
+
+    if(devicetype != "" && function_num != "" && method != "" && access != ""){
+      RPC.invoke("operation", {"msg":dict_temporary}).then((result) => {});
+     window.addEventListener('message', (event) => {
+            var show_msg1 = event.data.msg
+            if (show_msg1.charAt(0) == "f"){
+              document.getElementById("code").value=show_msg1.substr(1)
+            }
+            if (show_msg1.charAt(0) == "?"){
+              document.getElementById("out").value=show_msg1.substr(1)
+            }
+
+        });
+  }
+    else {
+      alert("请输入完整参数")
+    }
+
+  } else if (devicetype == "" && function_num == "" && method == "" && access == "" && out_num != ""){
+    to3_recv(out_num)
+  }else{
+    alert("请输入参数或删除上次残留数据")
+  }
+
+
+
+  }
+
+
+function to3_recv(out_num){
+
+  var  list1 = out_num.split(")")[0].split("(")[1].split(",")
+            document.getElementById("DeviceType").value = list1[0];
+            document.getElementById("Function").value = list1[1].trimStart();
+            document.getElementById("Method").value = list1[2];
+            document.getElementById("Access").value = list1[3];
+  RPC.invoke("operation", {"msg": {"ccode":out_num}}).then((result) => {});
+
+     window.addEventListener('message', (event) => {
+      var show_msg1 = event.data.msg
+      if (show_msg1.charAt(0) == "!"){
+            document.getElementById("code").value=show_msg1.substr(1)
+            if(document.getElementById("code").value == ""){
+            document.getElementById("code").value= "参数错误请重新输入"
+
+      }
+
+        list_out = list1
+        dict_num =  {"device_type":list1[0],
+        "function":list1[1].trimStart(),
+        "method":list1[2],
+        "access":list1[3]
+        }
+        }
+      }
+        );
+
+        }
+
+</script>
